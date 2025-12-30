@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 /**
- * Thread-safe in-memory repository for FuelEntry entities
+ * In-memory repository for FuelEntry entities
  * Maintains fuel entries with automatic ID generation
  */
 @Repository

@@ -1,8 +1,8 @@
-# AI-Powered Car Management & Fuel Tracking System
+# Car Management & Fuel Tracking System
 
-A comprehensive Java-based car management system with REST API backend and command-line interface client.
+A Java-based car management system with REST API backend and command-line interface client.
 
-## 🏗️ Architecture Overview
+## Architecture Overview
 
 The system consists of two modules:
 
@@ -11,15 +11,15 @@ The system consists of two modules:
 
 ### Technology Stack
 
-- **Framework**: Spring Boot 3.2.0
-- **Language**: Java 17
+- **Framework**: Spring Boot
+- **Language**: Java
 - **Build Tool**: Maven
-- **Data Storage**: Thread-safe in-memory repositories (ConcurrentHashMap)
-- **Validation**: Bean Validation (JSR-380)
-- **Logging**: SLF4J with Logback
-- **JSON Processing**: Jackson
+- **Data Storage**: in-memory storage
+- **Validation**: Bean Validation
+- **Logging**
+- **JSON Processing**
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 car-management-and-fuel-tracking/
@@ -46,7 +46,7 @@ car-management-and-fuel-tracking/
         └── Main.java       # CLI entry point
 ```
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -70,7 +70,7 @@ cd cli-client
 mvn clean package
 ```
 
-## 📡 Backend API Server
+## Backend API Server
 
 ### Running the Server
 
@@ -80,6 +80,45 @@ mvn spring-boot:run
 ```
 
 The server will start on `http://localhost:8080`
+
+### API Response Format
+
+All API endpoints return a standardized JSON structure relative to the instructions provided.
+
+#### Response Object Definition
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `success` | Boolean | Indicates if the operation was successful (`true`) or failed (`false`). |
+| `resp_msg` | String | A descriptive message about the operation result (e.g., "Success", "Car not found"). |
+| `resp_code` | Integer | Application-specific response code. Default: `100` for success, `101` for generic error. |
+| `data` | Object | The actual payload of the response. Can be an object, list, or null depending on the endpoint. |
+| `errors` | Object/Null | Contains detailed validation errors or error objects if `success` is false. Null on success. |
+| `pagination` | Object/Null | Pagination details if applicable (optional). |
+
+#### Standard Response Example (Success)
+
+```json
+{
+  "success": true,
+  "resp_msg": "Success",
+  "resp_code": 100,
+  "data": { ... },
+  "errors": null
+}
+```
+
+#### Standard Response Example (Error)
+
+```json
+{
+  "success": false,
+  "resp_msg": "Car not found with ID: 99",
+  "resp_code": 101,
+  "data": null,
+  "errors": null
+}
+```
 
 ### REST API Endpoints
 
@@ -98,11 +137,17 @@ Content-Type: application/json
 **Response**: `201 Created`
 ```json
 {
-  "id": 1,
-  "brand": "Toyota",
-  "model": "Corolla",
-  "year": 2018,
-  "fuelEntries": []
+  "success": true,
+  "resp_msg": "Car created successfully",
+  "resp_code": 100,
+  "data": {
+    "id": 1,
+    "brand": "Toyota",
+    "model": "Corolla",
+    "year": 2018,
+    "fuelEntries": []
+  },
+  "errors": null
 }
 ```
 
@@ -113,15 +158,21 @@ GET /api/cars
 
 **Response**: `200 OK`
 ```json
-[
-  {
-    "id": 1,
-    "brand": "Toyota",
-    "model": "Corolla",
-    "year": 2018,
-    "fuelEntries": []
-  }
-]
+{
+  "success": true,
+  "resp_msg": "Success",
+  "resp_code": 100,
+  "data": [
+    {
+      "id": 1,
+      "brand": "Toyota",
+      "model": "Corolla",
+      "year": 2018,
+      "fuelEntries": []
+    }
+  ],
+  "errors": null
+}
 ```
 
 #### 3. Get Car by ID
@@ -146,14 +197,19 @@ Content-Type: application/json
 **Response**: `201 Created`
 ```json
 {
-  "id": 1,
-  "liters": 45.5,
-  "price": 65.50,
-  "odometer": 10500,
-  "timestamp": "2025-12-30T21:00:00"
+  "success": true,
+  "resp_msg": "Fuel entry added successfully",
+  "resp_code": 100,
+  "data": {
+    "id": 1,
+    "liters": 45.5,
+    "price": 65.50,
+    "odometer": 10500,
+    "timestamp": "2025-12-30T21:00:00"
+  },
+  "errors": null
 }
 ```
-
 
 #### 5. Get Fuel Statistics (REST)
 ```http
@@ -163,13 +219,19 @@ GET /api/cars/{id}/fuel/stats
 **Response**: `200 OK`
 ```json
 {
-  "totalFuel": 90.0,
-  "totalCost": 130.00,
-  "averageConsumption": 7.5
+  "success": true,
+  "resp_msg": "Success",
+  "resp_code": 100,
+  "data": {
+    "totalFuel": 90.0,
+    "totalCost": 130.00,
+    "averageConsumption": 7.5
+  },
+  "errors": null
 }
 ```
 
-### 📖 API Documentation (Swagger/OpenAPI)
+### API Documentation (Swagger/OpenAPI)
 
 Interactive API documentation is available when the server is running. You can use this UI to explore endpoints and execute requests directly from your browser.
 
@@ -182,9 +244,9 @@ Interactive API documentation is available when the server is running. You can u
 GET /servlet/fuel-stats?carId=1
 ```
 
-**Response**: Same as REST endpoint, but processed through custom servlet
+**Response**: Same as REST endpoint.
 
-## 💻 CLI Client
+## CLI Client
 
 ### Running the CLI
 
@@ -202,29 +264,10 @@ java -jar target/car-cli.jar <command> <arguments>
 java -jar target/car-cli.jar create-car --brand Toyota --model Corolla --year 2018
 ```
 
-**Output**:
-```
-✓ Car created successfully!
-  Brand:  Toyota
-  Model:  Corolla
-  Year:   2018
-  ID:     1
-```
-
 #### 2. Add Fuel Entry
 
 ```bash
 java -jar target/car-cli.jar add-fuel --carId 1 --liters 45.5 --price 65.50 --odometer 10500
-```
-
-**Output**:
-```
-✓ Fuel entry added successfully!
-  Entry ID:  1
-  Liters:    45.50 L
-  Price:     65.50
-  Odometer:  10500 km
-  Timestamp: 2025-12-30T21:00:00
 ```
 
 #### 3. Get Fuel Statistics
@@ -233,41 +276,30 @@ java -jar target/car-cli.jar add-fuel --carId 1 --liters 45.5 --price 65.50 --od
 java -jar target/car-cli.jar fuel-stats --carId 1
 ```
 
-**Output**:
-```
-==================================================
-  Fuel Statistics for Car ID 1
-==================================================
-  Total Fuel:          90.00 L
-  Total Cost:          130.00
-  Average Consumption: 7.50 L/100km
-==================================================
-```
-
 #### 4. Display Help
 
 ```bash
 java -jar target/car-cli.jar help
 ```
 
-## 🔍 Key Features
+## Key Features
 
 ### Backend API
 
-1. **Thread-Safe In-Memory Storage**
+1. **In-Memory Storage**
    - Uses `ConcurrentHashMap` for concurrent access
    - `AtomicLong` for ID generation
    - No database required
 
-2. **Comprehensive Validation**
+2. **Validation**
    - Bean Validation annotations on DTOs
    - Business logic validation in service layer
    - Odometer reading progression validation
 
-3. **Global Exception Handling**
-   - Structured error responses
+3. **Exception Handling**
+   - Structured error responses via `ResponseHandler`
    - Field-level validation errors
-   - Proper HTTP status codes
+   - HTTP status codes
 
 4. **Dual Interface**
    - REST Controller endpoints
@@ -282,125 +314,21 @@ java -jar target/car-cli.jar help
 
 1. **User-Friendly Interface**
    - Clear command syntax
-   - Formatted output with visual separators
-   - Comprehensive error messages
+   - Formatted output with separators
+   - User friendly error messages
 
-2. **Robust Error Handling**
+2. **Error Handling**
    - Connection errors
    - API errors (404, 400, 500)
    - Validation errors
-   - Proper exit codes
+   - Exit codes
 
 3. **HTTP Client**
    - Java 11+ HttpClient
    - JSON serialization/deserialization
-   - Automatic error parsing
+   - Automatic generic ApiResponse parsing
 
-## 🧪 Testing the System
-
-### Complete Workflow Example
-
-1. **Start the backend server**:
-```bash
-cd backend-api
-mvn spring-boot:run
-```
-
-2. **In a new terminal, create a car**:
-```bash
-cd cli-client
-java -jar target/car-cli.jar create-car --brand Honda --model Civic --year 2020
-```
-
-3. **Add first fuel entry**:
-```bash
-java -jar target/car-cli.jar add-fuel --carId 1 --liters 40.0 --price 58.00 --odometer 10000
-```
-
-4. **Add second fuel entry**:
-```bash
-java -jar target/car-cli.jar add-fuel --carId 1 --liters 42.0 --price 60.50 --odometer 10550
-```
-
-5. **Get statistics**:
-```bash
-java -jar target/car-cli.jar fuel-stats --carId 1
-```
-
-Expected output shows:
-- Total Fuel: 82.00 L
-- Total Cost: 118.50
-- Average Consumption: ~7.45 L/100km
-
-## 📊 Data Models
-
-### Car Entity
-- `Long id` - Auto-generated unique identifier
-- `String brand` - Vehicle manufacturer
-- `String model` - Vehicle model name
-- `Integer year` - Manufacturing year (1900-2100)
-- `List<FuelEntry> fuelEntries` - Associated fuel records
-
-### FuelEntry Entity
-- `Long id` - Unique entry identifier
-- `Double liters` - Fuel quantity (positive value)
-- `Double price` - Total cost (positive value)
-- `Integer odometer` - Mileage reading (positive, must increase)
-- `LocalDateTime timestamp` - Auto-generated timestamp
-- `Car car` - Reference to parent car
-
-### FuelStats DTO
-- `Double totalFuel` - Sum of all liters
-- `Double totalCost` - Sum of all prices
-- `Double averageConsumption` - L/100km (null if < 2 entries)
-
-## 🔒 Validation Rules
-
-### Car Creation
-- Brand: Required, not blank
-- Model: Required, not blank
-- Year: Required, 1900-2100, cannot be more than 1 year in future
-
-### Fuel Entry
-- Liters: Required, positive value
-- Price: Required, positive value
-- Odometer: Required, positive value, must exceed previous readings
-
-## 🌐 API Error Responses
-
-All errors return structured JSON:
-
-```json
-{
-  "timestamp": "2025-12-30T21:00:00",
-  "status": 404,
-  "error": "Not Found",
-  "message": "Car not found with ID: 99",
-  "errorCode": "CAR_NOT_FOUND"
-}
-```
-
-### HTTP Status Codes
-- `200 OK` - Successful GET request
-- `201 Created` - Successful POST request
-- `400 Bad Request` - Validation error or invalid input
-- `404 Not Found` - Resource not found
-- `500 Internal Server Error` - Unexpected server error
-
-## 📝 Logging
-
-The backend uses SLF4J with Logback for comprehensive logging:
-
-- **DEBUG**: Service operations, repository interactions
-- **INFO**: HTTP requests, successful operations
-- **ERROR**: Exceptions, validation failures
-
-Log pattern:
-```
-2025-12-30 21:00:00 [thread-name] LEVEL logger-name - message
-```
-
-## 🎯 Design Patterns Used
+## Design Patterns Used
 
 1. **Repository Pattern** - Data access abstraction
 2. **Service Layer Pattern** - Business logic separation
@@ -410,28 +338,6 @@ Log pattern:
 6. **Command Pattern** - CLI command execution
 7. **Factory Pattern** - HTTP client creation
 
-## 🚀 Performance Considerations
+## Author
 
-- Thread-safe concurrent collections
-- In-memory storage for fast access
-- Efficient stream operations for statistics
-- No database overhead
-- Stateless REST API
-
-## 📄 License
-
-This project is part of a code challenge demonstration.
-
-## 👤 Author
-
-Elijah Laddie
-
-## 🤝 Contributing
-
-This is a demonstration project. For actual deployment, consider:
-- Persistent database (PostgreSQL, MySQL)
-- Authentication and authorization
-- Rate limiting
-- Caching layer
-- Containerization (Docker)
-- CI/CD pipeline
+Elie Kuradusenge

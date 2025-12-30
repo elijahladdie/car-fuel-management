@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Thread-safe in-memory repository for Car entities
+ * in-memory repository for Car entities
  * Uses ConcurrentHashMap for concurrent access and AtomicLong for ID generation
  */
 @Repository
