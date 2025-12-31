@@ -41,12 +41,20 @@ public class CarService {
         // Validate input parameters (additional business validation if needed)
         validateCarRequest(request);
         
+        // Check if car with same brand, model, and year already exists
+        String brand = request.getBrand().trim();
+        String model = request.getModel().trim();
+        int year = request.getYear();
+        
+        if (carRepository.existsByBrandAndModelAndYear(brand, model, year)) {
+            logger.warn("Car already exists: {} {} ({})", brand, model, year);
+            throw new IllegalArgumentException(
+                String.format("Car already exists: %s %s (%d)", brand, model, year)
+            );
+        }
+        
         // Convert DTO to entity
-        Car car = new Car(
-            request.getBrand().trim(),
-            request.getModel().trim(),
-            request.getYear()
-        );
+        Car car = new Car(brand, model, year);
         
         // Persist via repository
         Car savedCar = carRepository.save(car);
@@ -90,7 +98,6 @@ public class CarService {
      * @throws IllegalArgumentException if validation fails
      */
     private void validateCarRequest(CarRequest request) {
-        // Additional business rules can be added here
         if (request.getBrand().trim().isEmpty()) {
             throw new IllegalArgumentException("Brand cannot be empty");
         }
@@ -98,7 +105,7 @@ public class CarService {
             throw new IllegalArgumentException("Model cannot be empty");
         }
         
-        // Validate year is reasonable
+        // Validate if provided year is not in future
         int currentYear = java.time.Year.now().getValue();
         if (request.getYear() > currentYear + 1) {
             throw new IllegalArgumentException(

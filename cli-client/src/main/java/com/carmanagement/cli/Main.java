@@ -56,7 +56,7 @@ public class Main {
         } catch (java.io.IOException e) {
             // Handle connection errors
             System.err.println("CONNECTION ERROR: " + e.getMessage());
-            System.err.println("Please ensure the API server is running at http://localhost:8080");
+            System.err.println("Please ensure the API server is running and accessible.");
             System.exit(1);
             
         } catch (IllegalArgumentException e) {

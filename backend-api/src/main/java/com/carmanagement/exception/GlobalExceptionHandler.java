@@ -9,7 +9,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.time.LocalDateTime;
+import com.carmanagement.util.ResponseHandler;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,7 +31,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<com.carmanagement.dto.ApiResponse<Object>> handleCarNotFoundException(
             CarNotFoundException ex) {
         logger.error("Car not found: {}", ex.getMessage());
-        return com.carmanagement.util.ResponseHandler.error(
+        return ResponseHandler.error(
             null,
             ex.getMessage(),
             HttpStatus.NOT_FOUND
@@ -54,7 +55,7 @@ public class GlobalExceptionHandler {
             logger.error("Validation error - {}: {}", fieldName, errorMessage);
         });
         
-        return com.carmanagement.util.ResponseHandler.error(
+        return ResponseHandler.error(
             fieldErrors,
             "Input validation error",
             HttpStatus.BAD_REQUEST
@@ -69,7 +70,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<com.carmanagement.dto.ApiResponse<Object>> handleIllegalArgumentException(
             IllegalArgumentException ex) {
         logger.error("Illegal argument: {}", ex.getMessage());
-        return com.carmanagement.util.ResponseHandler.error(
+        return ResponseHandler.error(
             null,
             ex.getMessage(),
             HttpStatus.BAD_REQUEST
@@ -83,7 +84,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<com.carmanagement.dto.ApiResponse<Object>> handleGenericException(Exception ex) {
         logger.error("Unexpected error occurred", ex);
-        return com.carmanagement.util.ResponseHandler.error(
+        return ResponseHandler.error(
             null,
             "An unexpected error occurred. Please try again later.",
             HttpStatus.INTERNAL_SERVER_ERROR
