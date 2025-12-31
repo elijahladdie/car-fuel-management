@@ -7,6 +7,8 @@ import com.carmanagement.model.Car;
 import com.carmanagement.model.FuelEntry;
 import com.carmanagement.service.CarService;
 import com.carmanagement.service.FuelService;
+import com.carmanagement.util.ResponseHandler;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -19,9 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import java.net.URI;
 import java.util.List;
 
 /**
@@ -60,14 +59,8 @@ public class CarController {
         
         Car createdCar = carService.createCar(request);
         
-        // Build Location header with resource URI
-        URI location = ServletUriComponentsBuilder
-            .fromCurrentRequest()
-            .path("/{id}")
-            .buildAndExpand(createdCar.getId())
-            .toUri();
-        
-        return com.carmanagement.util.ResponseHandler.success(
+        // Build Location header with resource URI        
+        return ResponseHandler.success(
             createdCar, "Car created successfully", HttpStatus.CREATED
         );
     }

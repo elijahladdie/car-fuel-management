@@ -72,6 +72,20 @@ public class CarRepository {
     }
     
     /**
+     * Check if a car exists with exact brand, model, and year
+     * @param brand Car brand
+     * @param model Car model
+     * @param year Car year
+     * @return true if a matching car exists, false otherwise
+     */
+    public boolean existsByBrandAndModelAndYear(String brand, String model, int year) {
+        return carStorage.values().stream()
+            .anyMatch(car -> car.getBrand().equalsIgnoreCase(brand)
+                && car.getModel().equalsIgnoreCase(model)
+                && car.getYear() == year);
+    }
+    
+    /**
      * Clear all cars from the repository (useful for testing)
      */
     public void clear() {
